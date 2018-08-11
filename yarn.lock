@@ -4187,6 +4187,10 @@ react-lifecycles-compat@^3, react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
 
+react-native-bottomsheet@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/react-native-bottomsheet/-/react-native-bottomsheet-1.9.0.tgz#989e66e88129878084b4a8c51ff947c3e577b3f0"
+
 react-native-dismiss-keyboard@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-native-dismiss-keyboard/-/react-native-dismiss-keyboard-1.0.0.tgz#32886242b3f2317e121f3aeb9b0a585e2b879b49"
@@ -4214,6 +4218,10 @@ react-native-safe-area-view@^0.8.0:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.8.0.tgz#22d78cb8e8658d04a10cd53c1546e0bc86cb7aea"
   dependencies:
     hoist-non-react-statics "^2.3.1"
+
+react-native-swipeable-flat-list@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/react-native-swipeable-flat-list/-/react-native-swipeable-flat-list-0.0.5.tgz#87d5d4ab3626c0e798e64c9cc29e6dbc531b4fec"
 
 react-native-tab-view@^0.0.77:
   version "0.0.77"

@@ -7,6 +7,8 @@ import {
     StatusBar
 } from 'react-native'
 
+import { NavigationActions, StackActions } from 'react-navigation'
+
 export default class IntroScreen extends Component {
     render(){
         return(
@@ -32,7 +34,13 @@ export default class IntroScreen extends Component {
                     style={styles.signUpContainer}
                     onPress={
                         () => {
-                            this.props.navigation.navigate('LoginScreen')
+
+                            const resetAction = StackActions.reset({
+                                    index: 0,
+                                    actions: [NavigationActions.navigate({ routeName: 'LoginScreen' })],
+                                })
+                            this.props.navigation.dispatch(resetAction)
+                            // this.props.navigation.navigate('LoginScreen')
                         }
                     }
                     >

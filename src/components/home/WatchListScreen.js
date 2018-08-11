@@ -3,8 +3,12 @@ import {
     StyleSheet,
     View,
     Text,
-    FlatList
+    FlatList,
+    TouchableWithoutFeedback,
+    ToastAndroid
 } from 'react-native'
+import BottomSheet from 'react-native-bottomsheet'
+import {SwipeableFlatList} from 'react-native-swipeable-flat-list'
 
 import {connect} from 'react-redux'
 import {WatchListActions} from './../../redux/actions'
@@ -20,34 +24,77 @@ class WatchListScreen extends Component {
     }
 
     componentDidMount(){
-        this.props.getAllWatchList()
+        this.props.getWatchList({})
+    }
+
+    sortData(value){
+        // console.log('Sheet value ',value)
+        switch(value){
+            case 0: //a-z
+                let listArray = this.state.listData
+                listArray.sort(function(a, b){
+                    var x = a.name.toLowerCase()
+                    var y = b.name.toLowerCase()
+                    if (x < y) {return -1;}
+                    if (x > y) {return 1;}
+                    return 0
+                })
+                console.log('watch list sort ',listArray)
+                this.setState({listData : listArray})
+                break;
+            case 1: //z-a
+                let listArray1 = this.state.listData
+                listArray1.sort(function(a, b){
+                    var x = a.name.toLowerCase()
+                    var y = b.name.toLowerCase()
+                    if (x < y) {return 1;}
+                    if (x > y) {return -1;}
+                    return 0
+                })
+                console.log('watch list sort ',listArray1)
+                this.setState({listData : listArray1})
+                break;
+        }
+    }
+
+    openBottomSheet(){
+        BottomSheet.showBottomSheetWithOptions({
+            options: ['A-Z', 'Z-A', 'Cancel'],
+            title: 'Sort by',
+            dark: false,
+            cancelButtonIndex: 3,
+          }, (value) => {
+              
+              this.sortData(value)
+            // alert(value);
+          });
     }
 
     _renderItem = ({item}) => (
         <MyListItem
+        style={{ height: 60 }}
           id={item.id}
           onPressItem={this._onPressItem}
-          selected={!!this.state.selected.get(item.id)}
-          title={item.title}
+        //   selected={!!this.state.selected.get(item.id)}
+          title={item.name}
+          website={item.website}
         />
       )
 
-      _keyExtractor = (item, index) => item.id
+      _keyExtractor = (item, index) => item.id.toString()
 
       _onPressItem = (id) => {
-        // updater functions are preferred for transactional updates
-        this.setState((state) => {
-          // copy the map rather than modifying state.
-          const selected = new Map(state.selected);
-          selected.set(id, !selected.get(id)); // toggle
-          return {selected}
-        })
+        
       }
 
       componentWillReceiveProps(nextProps){
-          if(nextProps){
-              console.log('WatchList ',nextProps)
-          }
+          if(nextProps.watchList){
+            if(!nextProps.watchList.error && !nextProps.watchList.loading ){
+                this.setState({listData : nextProps.watchList.payload,loading : false})
+            }else{
+                console.log('WatchList willReceiveProps failure ',nextProps)
+            }
+         }
       }
 
 
@@ -56,19 +103,38 @@ class WatchListScreen extends Component {
             <View style={styles.rootContainer}>
                 <View style={styles.headerContainer}>
                     <View style={styles.headerLeftContainer}>
-                        <Text style={styles.titleText}>Watch List </Text>
+                        <Text style={styles.titleText}>Watch List</Text>
                     </View>
 
                     <View style={styles.headerRightContainer}>
-                        <Text style={styles.rightText}>Sort</Text>
+                        <TouchableWithoutFeedback 
+                            style={styles.headerTouchContainer}
+                            onPress={()=>{
+                                if(this.state.listData.length > 0){
+                                    this.openBottomSheet()
+                                }else{
+                                    ToastAndroid.show('No data to sort', ToastAndroid.SHORT)
+                                }
+                            } }>
+                            <View style={styles.headerTouchRootContainer}>
+                                <Text style={styles.rightText}>Sort</Text>
+                            </View>
+                        </TouchableWithoutFeedback>
+                        
                     </View>
                 </View>
 
                 <View style={styles.bodyContainer}>
-                    <FlatList
-                        data={this.props.data}
+                    <SwipeableFlatList
+                        data={this.state.listData}
                         extraData={this.state}
                         keyExtractor={this._keyExtractor}
+                        renderRight={({ item }) => (
+                            <View style={styles.swipeRoot}>
+                                <Text style={styles.swipeText}>Delete</Text>
+                            </View>
+                            
+                        )}
                         renderItem={this._renderItem}
                     />
                 </View>
@@ -85,18 +151,45 @@ class MyListItem extends React.PureComponent {
     };
   
     render() {
-      const textColor = this.props.selected ? "red" : "black";
       return (
-        <TouchableOpacity onPress={this._onPress}>
-          <View>
-            <Text style={{ color: textColor }}>
-              {this.props.title}
-            </Text>
+          <View style={itemStyle.rootContainer}>
+            <TouchableWithoutFeedback onPress={this._onPress}>
+                <View style={itemStyle.bodyContainer}>
+                    <Text style={itemStyle.textTitleStyle}>
+                    {this.props.title}
+                    </Text>
+
+                    <Text style={itemStyle.textBodyStyle}>
+                    {this.props.website}
+                    </Text>
+                </View>
+            </TouchableWithoutFeedback>
           </View>
-        </TouchableOpacity>
+        
       );
     }
   }
+
+  const itemStyle = StyleSheet.create({
+      rootContainer : {
+          flex : 1,
+          padding : 5,
+          margin : 5,
+          backgroundColor : '#545d8e',
+      },
+      bodyContainer : {
+
+      },
+      textTitleStyle : {
+          color : '#fff',
+          fontWeight : 'bold',
+          fontSize : 18
+      },
+      textBodyStyle : {
+          color : '#fff',
+          fontSize : 16
+      }
+  })
 
   function mapStateToProps(state) {
     return {
@@ -112,6 +205,16 @@ const styles = StyleSheet.create({
         flex : 1,
         backgroundColor : '#fff'
     },
+    swipeRoot : {
+        flex : 1,
+        alignItems : 'center',
+        justifyContent : 'center',
+        alignSelf : 'stretch',
+        height : '100%',
+    },
+    swipeText:{
+        fontSize : 18,
+    },
     headerContainer : {
         flex : 1,
         flexDirection : 'row',
@@ -123,6 +226,15 @@ const styles = StyleSheet.create({
         flex : 9
     },
     headerRightContainer : {
+        flex : 1,
+        alignItems : 'center',
+        justifyContent : 'center'
+    },
+    headerTouchContainer : {
+        flex : 1,
+        alignSelf : 'stretch'
+    },
+    headerTouchRootContainer : {
         flex : 1,
         alignItems : 'center',
         justifyContent : 'center'

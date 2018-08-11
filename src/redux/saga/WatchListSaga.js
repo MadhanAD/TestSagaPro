@@ -1,14 +1,17 @@
 import {put,all,takeEvery,call,fork} from 'redux-saga/effects'
 import {get} from './../../config/api'
 import {WatchListActions} from './../actions'
+import {USER_URL} from './../../config/url'
 
-function* getAllWatchList(action){
-    yield put(WatchListActions.requestWatchList)
+function* getWatchList(action){
+    
+    yield put(WatchListActions.requestWatchList())
 
-    const response = yield call(get(action.method))
+    const response = yield call(get,USER_URL)
 
     if(response && response.response){
         //success response 
+        // console.log('WatchList saga ',response.response)
         yield put(WatchListActions.successWatchList(response.response))
     }else{
         //failure response
@@ -17,5 +20,5 @@ function* getAllWatchList(action){
 }
 
 export default function* WatchListSaga(){
-    yield all([fork(takeEvery,WatchListActions.WATCH_LIST_REQUEST,getAllWatchList)])
+    yield all ([fork(takeEvery,WatchListActions.WATCH_LIST,getWatchList)])
 }

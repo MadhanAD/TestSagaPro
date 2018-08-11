@@ -1,8 +1,8 @@
 import axios from 'axios'
 import {BASE_URL} from './url'
 
-export function get(method,params){
-    let url = `${BASE_URL}${method}${params}`
+export function get(method){
+    let url = `${method}`
     return axios.get(url)
     .then(response =>{
         return {response}
@@ -12,7 +12,7 @@ export function get(method,params){
     })
 }
 
-export function post(method,params){
+export function POST(method,params){
     return axios.post(`${BASE_URL}${method}`,params)
             .then(response => {
                 return {

@@ -61,7 +61,7 @@ const AppStackNavigator = createStackNavigator(
 
     },{
         headerMode : 'none',
-        initialRouteName : 'LoginScreen',        
+        initialRouteName : 'IntroScreen',        
     }
 )
 

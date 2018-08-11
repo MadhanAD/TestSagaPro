@@ -1,5 +1,8 @@
 import {createAction } from 'redux-actions'
 
+export const WATCH_LIST = 'watchList/watchList'
+export const getWatchList = createAction(WATCH_LIST)
+
 export const WATCH_LIST_REQUEST = 'watchList/watchListRequest'
 export const requestWatchList = createAction(WATCH_LIST_REQUEST)
 

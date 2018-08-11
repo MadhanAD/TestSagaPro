@@ -6,8 +6,12 @@ import {
     StatusBar,
     TouchableWithoutFeedback,
     TextInput,
-    ToastAndroid
+    ToastAndroid,
+    TouchableOpacity
 } from 'react-native'
+
+import { NavigationActions, StackActions } from 'react-navigation'
+
 import { LoginActions } from '../../redux/actions';
 
 import {connect} from 'react-redux'
@@ -63,17 +67,20 @@ class LoginScreen extends Component {
                     </View>
 
                     <View style={styles.signInRootContainer}>
-                    <TouchableWithoutFeedback
-                        onPress={()=>{
-                            this.loginApiData()
-                            // this.props.navigation.navigate('homeScreen')
-                        }}
-                        style={styles.signInContainer}
-                        >
-                        <Text style={styles.basicText}>SIGN IN </Text>
-                    </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback
+                            onPress={()=>{
+                                console.log('login clicked')
+                                this.loginApiData()
+                            }}
+                            style={styles.signInContainer}
+                            >
+                            <View style={styles.btnContainer}> 
+                                <Text style={styles.basicText}>SIGN IN </Text>
+                            </View>
+                            
+                        </TouchableWithoutFeedback>
 
-                </View>
+                    </View>
                 </View>
 
             </View>
@@ -81,12 +88,16 @@ class LoginScreen extends Component {
     }
 
     loginApiData(){
-        this.props.loginApiCall({})
-        // if(this.isValidMailId()){
-        //     this.props.loginApiCall({})
-        // }else{
-        //     ToastAndroid.show('Enter valid mail id', ToastAndroid.SHORT);
-        // }
+        // this.props.loginApiCall({})
+        if(this.isValidMailId()){
+            if(this.isValidData()){
+                this.props.loginApiCall({})
+            }else{
+                ToastAndroid.show('Mail id doesn\'t exists', ToastAndroid.SHORT)
+            }            
+        }else{
+            ToastAndroid.show('Enter valid mail id', ToastAndroid.SHORT)
+        }
     }
 
     isValidMailId(){
@@ -97,6 +108,33 @@ class LoginScreen extends Component {
             return false;
         }
         return true;
+    }
+
+    isValidData(){
+        if(this.state.email === 'user@gmail.com' && this.state.password === 'user@123'){
+            return true
+        }else{
+            return false
+        }
+    }
+
+    componentWillReceiveProps(nextProps){
+        if(nextProps){
+            if(nextProps.login && !nextProps.login.error){
+                ToastAndroid.show('Login success ', ToastAndroid.SHORT)
+
+                const resetAction = StackActions.reset({
+                    index: 0,
+                    actions: [NavigationActions.navigate({ routeName: 'homeScreen' })],
+                })
+                this.props.navigation.dispatch(resetAction)
+
+                // this.props.navigation.navigate('homeScreen')
+            }else{
+                ToastAndroid.show('Invalid credentials', ToastAndroid.SHORT)
+            }
+            // console.log('componentWillReceiveProps ', nextProps)
+        }
     }
 }
 
@@ -115,6 +153,12 @@ const styles = StyleSheet.create({
         alignItems : 'center',
         justifyContent : 'center',
         backgroundColor : '#fff'
+    },
+    btnContainer : {
+        flex : 1,
+        alignSelf : 'stretch',
+        alignItems : 'center',
+        justifyContent : 'center'
     },
     headerContainer : {
         flex : 1,
@@ -178,6 +222,4 @@ const styles = StyleSheet.create({
         color : '#fff',
         fontWeight : 'bold'
     }
-
-
 })
